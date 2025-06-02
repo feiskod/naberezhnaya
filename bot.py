@@ -34,32 +34,38 @@ async def send_poll(context: ContextTypes.DEFAULT_TYPE):
     print("✅ Опрос отправлен в группу")
 
 async def handle_response(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Обработка ответов"""
     query = update.callback_query
     user = query.from_user
-    
+
     if query.data == "no":
         participants.pop(user.id, None)
         await query.answer(f"{user.first_name} не идёт")
+
     elif query.data == "yes":
+        # Отвечаем, чтобы убрать "часики" на кнопке
+        await query.answer("Выберите время в личных сообщениях")
+
+        # Отправляем ЛИЧНОЕ сообщение пользователю с кнопками выбора времени
         time_buttons = [
-            [InlineKeyboardButton("15:00", callback_data="time_15")],
-            [InlineKeyboardButton("16:00", callback_data="time_16")],
-            [InlineKeyboardButton("17:00", callback_data="time_17")]
+            [InlineKeyboardButton("18:00", callback_data="time_18")],
+            [InlineKeyboardButton("19:00", callback_data="time_19")],
+            [InlineKeyboardButton("20:00", callback_data="time_20")]
         ]
-        await query.edit_message_reply_markup(
+        await context.bot.send_message(
+            chat_id=user.id,
+            text="Выберите время тренировки:",
             reply_markup=InlineKeyboardMarkup(time_buttons)
         )
-        await query.answer("Выберите время:")
-        return
+        # НЕ меняем кнопки в групповом сообщении — оставляем как есть
+
     elif query.data.startswith("time_"):
-        time = query.data.split('_')[1]
+        time_chosen = query.data.split('_')[1]
         participants[user.id] = {
             "name": user.first_name,
-            "time": f"{time}:00"
+            "time": f"{time_chosen}:00"
         }
-        await query.answer(f"Записал на {time}:00!")
-    
+        await query.answer(f"Записал на {time_chosen}:00!")
+
     await update_summary(context.bot)
 
 async def update_summary(bot):
