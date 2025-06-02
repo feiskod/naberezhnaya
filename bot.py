@@ -96,7 +96,7 @@ def main():
 
     # Правильная установка времени на 12:40 по Новосибирску
     tz = pytz.timezone("Asia/Novosibirsk")
-    run_time = dt_time(hour=13, minute=30, tzinfo=tz)
+    run_time = dt_time(hour=13, minute=37, tzinfo=tz)
 
     print("📅 Планировщик опроса назначен на 13:00 по Новосибирску")
 
